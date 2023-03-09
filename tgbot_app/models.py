@@ -24,7 +24,10 @@ class UserSession(models.Model):
     created_at = models.DateTimeField(verbose_name='время добавления', auto_now_add=True)
 
     def __str__(self):
-        return f'<Session: {self.id}({self.product_title})>'
+        return f'<Session: {self.id} ({self.product_title})>'
+
+    def update_field(self, field, new_value):
+        self.__setattr__(field, new_value)
 
 
 class Message(models.Model):
