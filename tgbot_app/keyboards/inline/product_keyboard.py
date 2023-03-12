@@ -7,6 +7,7 @@ product_cd = CallbackData('product', 'is_new')
 details_cd = CallbackData('details', 'field', 'level', 'is_back')
 change_detail_cd = CallbackData('change', 'field')
 cancel_cd = CallbackData('cancel')
+chatgpt_cd = CallbackData('chatgpt', 'action')
 
 
 async def gen_product_kb(user_id):
@@ -41,7 +42,7 @@ async def gen_product_kb(user_id):
         ),
         InlineKeyboardButton(
             text='ChatGPT магия',
-            callback_data='1'
+            callback_data=chatgpt_cd.new(action='start')
         ),
     )
 

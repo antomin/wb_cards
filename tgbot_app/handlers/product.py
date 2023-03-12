@@ -41,7 +41,7 @@ async def add_new_sku(message: Message, state: FSMContext):
             return
 
         await add_user_session(message.from_user, data)
-        await message.answer('Данные загружены.')
+        await message.answer('Данные загружены.', reply_markup=await gen_product_kb(message.from_user.id))
         await state.reset_state()
 
     else:

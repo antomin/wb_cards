@@ -1,3 +1,4 @@
+from .chatgpt import dp
 from .help import dp
 from .product import dp
 from .start import dp

@@ -14,8 +14,8 @@ class AppUser(models.Model):
 class UserSession(models.Model):
     user = models.ForeignKey(AppUser, verbose_name='пользователь', on_delete=models.PROTECT)
     product_title = models.CharField(verbose_name='наименование товара', max_length=255)
-    product_description = models.TextField(verbose_name='описание товара')
-    product_characteristics = models.JSONField(verbose_name='характеристики товара')
+    product_description = models.TextField(verbose_name='описание товара', blank=True, null=True)
+    product_characteristics = models.JSONField(verbose_name='характеристики товара', blank=True, null=True)
     other_descriptions_1 = models.TextField(verbose_name='дополнительные описания 1', blank=True, null=True)
     other_descriptions_2 = models.TextField(verbose_name='дополнительные описания 2', blank=True, null=True)
     other_descriptions_3 = models.TextField(verbose_name='дополнительные описания 3', blank=True, null=True)
@@ -32,7 +32,8 @@ class UserSession(models.Model):
 
 class Message(models.Model):
     user_session = models.ForeignKey(UserSession, verbose_name='сессия', on_delete=models.PROTECT)
-    is_answer = models.BooleanField(verbose_name='chatGPT', default=False)
+    is_user = models.BooleanField(verbose_name='сообщение от пользователя', default=True)
+    is_active = models.BooleanField(verbose_name='текущий', default=True)
     text = models.TextField(verbose_name='сообщение')
     created_at = models.DateTimeField(verbose_name='время добавления', auto_now_add=True)
 

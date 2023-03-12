@@ -1,0 +1,12 @@
+[Unit]
+Description=WBCards daemon
+After=network.target
+
+[Service]
+User=etobusiness
+Group=etobusiness
+WorkingDirectory=/home/etobusiness/wb_cards
+ExecStart=/home/etobusiness/wb_cards/venv/bin/python /home/etobusiness/wb_cards/manage.py runbot
+
+[Install]
+WantedBy=multi-user.target
