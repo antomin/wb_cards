@@ -6,7 +6,7 @@ from tgbot_app.keyboards.inline.update_keyboard import gen_update_kb, update_cd
 from tgbot_app.loader import dp
 
 
-@dp.message_handler(lambda message: 'Обновить' in message.text)
+@dp.message_handler(commands=['reset'])
 async def product_handler(message: Message):
     await message.answer(
         text='ВНИМАНИЕ!!!\nОбновление удалит все раннее загруженные данные.\nВы уверены?',

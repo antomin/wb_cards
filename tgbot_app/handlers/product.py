@@ -14,7 +14,7 @@ from tgbot_app.keyboards.inline.product_keyboard import (cancel_cd, details_cd,
 from tgbot_app.loader import dp
 
 
-@dp.message_handler(lambda message: 'Товар' in message.text)
+@dp.message_handler(commands=['product'])
 async def product(message: Message):
     keyboard = await gen_product_kb(message.from_user.id)
     await message.delete()

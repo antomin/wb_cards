@@ -103,7 +103,7 @@ async def gen_conversation(user_id):
 
 async def get_chatgpt_answer(user_id):
     last_msg = await get_last_msg(user_id)
-    if not last_msg.is_user:
+    if last_msg and not last_msg.is_user:
         return last_msg.text
 
     conversation = await gen_conversation(user_id)
