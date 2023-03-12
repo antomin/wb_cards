@@ -2,7 +2,7 @@ from django.db import models
 
 
 class AppUser(models.Model):
-    id = models.PositiveIntegerField(verbose_name='телеграм id', primary_key=True, unique=True)
+    id = models.BigIntegerField(verbose_name='телеграм id', primary_key=True, unique=True)
     username = models.CharField(verbose_name='имя пользователя', max_length=32, unique=True)
     name = models.CharField(verbose_name='имя', max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(verbose_name='время добавления', auto_now_add=True)

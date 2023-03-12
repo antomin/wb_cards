@@ -1,12 +1,13 @@
 [Unit]
-Description=WBCards daemon
+Description=WBCards telegrambot daemon
 After=network.target
 
 [Service]
-User=etobusiness
-Group=etobusiness
-WorkingDirectory=/home/etobusiness/wb_cards
-ExecStart=/home/etobusiness/wb_cards/venv/bin/python /home/etobusiness/wb_cards/manage.py runbot
+User=wbcards
+Group=wbcards
+WorkingDirectory=/home/wbcards/wb_cards
+ExecStart=/home/wbcards/wb_cards/venv/bin/python /home/wbcards/wb_cards/manage.py runbot
+Restart=on-abort
 
 [Install]
 WantedBy=multi-user.target
