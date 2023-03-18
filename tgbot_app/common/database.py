@@ -11,25 +11,36 @@ def get_active_session(user_id):
 
 
 @sync_to_async
-def add_user_session(from_user, data):
+def add_user_session(user_id, username, data):
     try:
-        user = AppUser.objects.get(id=int(from_user.id))
+        user = AppUser.objects.get(id=int(user_id))
     except Exception:
-        user = AppUser(id=int(from_user.id), username=from_user.username)
+        user = AppUser(id=int(user_id), username=username)
         user.save()
 
     session = UserSession(
         user=user,
-        product_title=data.get('title'),
-        product_description=data.get('description'),
-        product_characteristics=json.dumps(data.get('characteristics'), ensure_ascii=False),
+        title=data.get('title'),
+        description=data.get('description'),
+        characteristics=json.dumps(data.get('characteristics'), ensure_ascii=False),
     )
     session.save()
 
 
 @sync_to_async
 def update_field_session(user_id, field, value):
+
     session = UserSession.objects.filter(user=user_id, is_active=True).last()
+
+    if not session:
+        try:
+            user = AppUser.objects.get(id=int(user_id))
+        except Exception:
+            user = AppUser(id=int(user_id))
+            user.save()
+
+        session = UserSession(user=user)
+
     session.update_field(field, value)
     session.save()
 

@@ -10,23 +10,12 @@ from tgbot_app.common.wb_parser import parse_wb
 
 async def get_value(user_id, field):
     session = await get_active_session(user_id)
-
-    if field == 'other_descriptions':
-        data = [session.other_descriptions_1, session.other_descriptions_2, session.other_descriptions_3]
-        result = []
-
-        for desc in data:
-            if desc:
-                result.append(desc)
-
-        return '\n\n'.join(result) if result else 'Нет данных...'
-
     data = session.serializable_value(field)
 
     if not data:
         return 'Нет данных...'
 
-    if field == 'product_characteristics':
+    if field == 'characteristics':
         data = json.loads(data)
         result = []
         for key, value in data.items():
