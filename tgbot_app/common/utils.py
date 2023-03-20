@@ -5,14 +5,14 @@ import openai
 from tgbot_app.common.database import (get_active_session, get_last_msg,
                                        get_msg_history, save_msg,
                                        update_field_session)
-from tgbot_app.common.wb_parser import parse_wb
 
 
 async def get_value(user_id, field):
     session = await get_active_session(user_id)
+
     data = session.serializable_value(field)
 
-    if not data:
+    if not data or data == 'null':
         return 'Нет данных...'
 
     if field == 'characteristics':
@@ -28,42 +28,8 @@ async def get_value(user_id, field):
 
 async def update_data(user_id, field, value):
     try:
-        if field == 'product_characteristics':
-            result = {}
-            data = value.split('\n')
-
-            for char in data:
-                key, value = [i.strip() for i in char.split(':')[:2]]
-                result[key] = value
-
-            result_json = json.dumps(result, ensure_ascii=False)
-
-            await update_field_session(user_id, field, result_json)
-
-            return True
-
-        if field == 'other_descriptions':
-            data = value.split()
-
-            for idx in range(1, 4):
-                db_field = field + '_' + str(idx)
-                await update_field_session(user_id, db_field, None)
-
-            for idx, scu in enumerate(data[:3], start=1):
-                scu = scu.strip()
-                parse_data = await parse_wb(scu)
-                description = parse_data.get('description')
-
-                if description:
-                    db_field = field + '_' + str(idx)
-                    await update_field_session(user_id, db_field, description)
-
-            return True
-
         await update_field_session(user_id, field, value)
-
         return True
-
     except Exception:
         return False
 

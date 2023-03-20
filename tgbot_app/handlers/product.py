@@ -2,8 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import MessageNotModified
 
-from tgbot_app.common.database import add_user_session
-from tgbot_app.common.media import HEADER_PHOTO_ID
+from tgbot_app.common.database import add_user_session, get_active_session
 from tgbot_app.common.text_variables import NEW_SKU
 from tgbot_app.common.utils import get_value, update_data
 from tgbot_app.common.wb_parser import parse_wb
@@ -17,7 +16,7 @@ from tgbot_app.loader import dp
 async def product(callback: CallbackQuery):
     user_id = callback.from_user.id
     markup = await gen_product_kb(user_id)
-    await callback.message.edit_caption(caption='Товар:', reply_markup=markup)
+    await callback.message.edit_text(text='Меню товара:', reply_markup=markup)
 
 
 @dp.callback_query_handler(scu_cd.filter())
@@ -25,7 +24,7 @@ async def sku(callback: CallbackQuery, state: FSMContext):
     markup = await gen_cancel_kb()
     await state.set_state('new_scu')
     await callback.answer()
-    await callback.message.edit_caption(caption=NEW_SKU, reply_markup=markup)
+    await callback.message.edit_text(text=NEW_SKU, reply_markup=markup)
 
 
 @dp.message_handler(state='new_scu')
@@ -40,7 +39,7 @@ async def load_scu(message: Message, state: FSMContext):
         data = await parse_wb(_sku)
 
         if not data:
-            await message.edit_text('Неверный SKU. попробуйте ещё раз:', reply_markup=cancel_markup)
+            await message.answer('Неверный SKU. попробуйте ещё раз:', reply_markup=cancel_markup)
             return
 
         await add_user_session(user_id, message.from_user.username, data)
@@ -48,7 +47,7 @@ async def load_scu(message: Message, state: FSMContext):
         text = f'<b>Название:</b>\n{data["title"]}\n\n<b>Описание:</b>\n{data["description"][:100]}...'
         markup = await gen_product_kb(user_id)
 
-        await message.answer_photo(photo=HEADER_PHOTO_ID, caption=text, reply_markup=markup)
+        await message.answer(text=text, reply_markup=markup)
         await state.reset_state()
 
     else:
@@ -57,21 +56,64 @@ async def load_scu(message: Message, state: FSMContext):
 
 @dp.callback_query_handler(product_cd.filter(level='0'))
 async def show_product_details(callback: CallbackQuery, callback_data: dict):
+    user_id = callback.from_user.id
     field = callback_data.get('field')
-    value = await get_value(callback.from_user.id, field)
+
+    session = await get_active_session(user_id)
+    if not session:
+        await add_user_session(user_id, callback.from_user.username, {})
+
+    value = await get_value(user_id, field)
     markup = await gen_details_kb(field)
 
+    if field == 'seo_dict':
+        value = 'Раздел на доработке.'
+
     try:
-        await callback.message.edit_caption(caption=value, reply_markup=markup)
+        await callback.message.edit_text(text=value, reply_markup=markup)
     except MessageNotModified:
         await callback.answer()
 
 
+@dp.callback_query_handler(product_cd.filter(level='1'))
+async def edit_product_details(callback: CallbackQuery, state: FSMContext, callback_data: dict):
+    field = callback_data.get('field')
+
+    await state.set_state('change_data')
+
+    async with state.proxy() as data:
+        data['field'] = field
+
+    if field == 'seo_plus':
+        text = 'Введите SEO слова через запятую:'
+    elif field == 'important':
+        text = 'Опишите главные преимущества Вашего товара:'
+    else:
+        text = 'Введите новые данные:'
+
+    await callback.message.answer(text=text, reply_markup=await gen_cancel_kb())
+    await callback.answer()
 
 
+@dp.message_handler(state='change_data')
+async def save_new_details(message: Message, state: FSMContext):
+    user_id = message.from_user.id
+    value = message.text
 
+    async with state.proxy() as data:
+        field = data['field']
 
+    result = await update_data(user_id, field, value)
 
+    if result:
+        await message.answer(text='Данные успешно изменены.', reply_markup=await gen_product_kb(user_id))
+        await state.reset_state()
+        return
+
+    await message.answer(
+        text='Ошибка при добавлении данных. Попробуйте ещё раз:',
+        reply_markup=await gen_cancel_kb()
+    )
 
 
 @dp.callback_query_handler(cancel_state_cd.filter(), state='*')
@@ -79,27 +121,10 @@ async def cancel_changing(callback: CallbackQuery, state: FSMContext):
     markup = await gen_product_kb(callback.from_user.id)
     await callback.answer()
     await state.reset_state()
-    await callback.message.answer_photo(photo=HEADER_PHOTO_ID, reply_markup=markup)
+    await callback.message.edit_text(text='Отменено.', reply_markup=markup)
 
 
 
-# @dp.callback_query_handler(details_cd.filter(level='0'))
-# async def show_details(callback: CallbackQuery, callback_data: dict):
-#     field = callback_data.get('field')
-#     is_back = callback_data.get('is_back')
-#     text = await get_value(callback.from_user.id, field)
-#
-#     if is_back == 'True':
-#         markup = await gen_product_kb(callback.from_user.id)
-#     else:
-#         markup = await gen_current_detail_kb(field)
-#
-#     try:
-#         await callback.message.edit_text(text=text, reply_markup=markup)
-#     except MessageNotModified:
-#         await callback.answer()
-#
-#
 # @dp.callback_query_handler(details_cd.filter(level='1'))
 # async def change_details(callback: CallbackQuery, callback_data: dict, state: FSMContext):
 #     field = callback_data.get('field')

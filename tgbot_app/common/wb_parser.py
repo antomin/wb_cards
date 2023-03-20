@@ -15,8 +15,8 @@ async def parse_wb(sku: str) -> dict | None:
     vol = part[:-2]
     try:
         async with aiohttp.ClientSession() as session:
-            for basket in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16',
-                           '17', '18', '19', '20']:
+            for basket in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15',
+                           '16', '17', '18', '19', '20']:
                 url = f'https://basket-{basket}.wb.ru/vol{vol}/part{part}/{sku}/info/ru/card.json'
                 response = await session.get(url=url)
                 if response.ok:

@@ -29,17 +29,7 @@ def add_user_session(user_id, username, data):
 
 @sync_to_async
 def update_field_session(user_id, field, value):
-
     session = UserSession.objects.filter(user=user_id, is_active=True).last()
-
-    if not session:
-        try:
-            user = AppUser.objects.get(id=int(user_id))
-        except Exception:
-            user = AppUser(id=int(user_id))
-            user.save()
-
-        session = UserSession(user=user)
 
     session.update_field(field, value)
     session.save()

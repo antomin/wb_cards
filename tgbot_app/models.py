@@ -23,9 +23,6 @@ class UserSession(models.Model):
     is_active = models.BooleanField(verbose_name='открыта', default=True)
     created_at = models.DateTimeField(verbose_name='время добавления', auto_now_add=True)
 
-    def __str__(self):
-        return f'<Session: {self.id} ({self.product_title})>'
-
     def update_field(self, field, new_value):
         self.__setattr__(field, new_value)
 
@@ -42,3 +39,8 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class SeoWB(models.Model):
+    frase = models.CharField(verbose_name='фраза', max_length=255)
+    frequency = models.BigIntegerField(verbose_name='частота')
