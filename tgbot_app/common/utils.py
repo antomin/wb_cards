@@ -5,6 +5,9 @@ import openai
 from tgbot_app.common.database import (get_active_session, get_last_msg,
                                        get_msg_history, save_msg,
                                        update_field_session)
+from tgbot_app.common.text_variables import (REQUEST_DESC, REQUEST_IMP,
+                                             REQUEST_MAIN, REQUEST_SEO,
+                                             REQUEST_STYLE)
 
 
 async def get_value(user_id, field):
@@ -34,20 +37,31 @@ async def update_data(user_id, field, value):
         return False
 
 
+async def get_init_text(session, add_seo):
+    result = REQUEST_MAIN.format(title=session.title)
+
+    if session.description:
+        result += ' ' + REQUEST_DESC.format(desc=session.description)
+
+    if add_seo:
+        result += ' ' + REQUEST_SEO.format(seo=session.seo_plus)
+
+    if session.important:
+        result += ' ' + REQUEST_IMP.format(imp=session.important)
+
+    if session.style:
+        result += ' ' + REQUEST_STYLE.format(style=session.style)
+
+    return result
+
+
 async def gen_conversation(user_id, add_seo):
     conversation = [{'role': 'system', 'content': 'You are a helpful assistant. Fluent Russian speaks.'}]
     msg_history, msg_cnt = await get_msg_history(user_id)
 
     if msg_cnt == 0:
         session = await get_active_session(user_id)
-        init_text = f'Напиши описание товара для маркетплейса, используя следующую информацию. Название торговой' \
-                    f'марки {session.title}.'
-
-        if add_seo:
-            init_text += f' Добавь SEO словарь: {session.seo_plus}.'
-
-        if session.style:
-            init_text += f' Стиль описания - {session.style}.'
+        init_text = await get_init_text(session, add_seo)
 
         await save_msg(user_id, init_text, is_user=True)
         conversation.append({'role': 'user', 'content': init_text})
