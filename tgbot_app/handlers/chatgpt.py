@@ -12,7 +12,7 @@ from tgbot_app.loader import dp
 
 
 @dp.callback_query_handler(main_menu_cd.filter(action='chatgpt'))
-async def chatgpt_main(callback: CallbackQuery):
+async def chatgpt_main(callback: CallbackQuery | Message):
     session = await get_active_session(callback.from_user.id)
 
     if not session:

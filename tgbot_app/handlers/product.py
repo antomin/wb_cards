@@ -12,11 +12,17 @@ from tgbot_app.keyboards.inline import (cancel_state_cd, gen_cancel_kb,
 from tgbot_app.loader import dp
 
 
+@dp.message_handler(commands=['product'])
 @dp.callback_query_handler(main_menu_cd.filter(action='product'))
-async def product(callback: CallbackQuery):
+async def product(callback: CallbackQuery | Message):
     user_id = callback.from_user.id
     markup = await gen_product_kb(user_id)
-    await callback.message.edit_text(text=PRODUCT_MSG, reply_markup=markup)
+
+    if isinstance(callback, CallbackQuery):
+        await callback.message.edit_text(text=PRODUCT_MSG, reply_markup=markup)
+        return
+
+    await callback.answer(text=PRODUCT_MSG, reply_markup=markup)
 
 
 @dp.callback_query_handler(scu_cd.filter())
@@ -59,10 +65,6 @@ async def show_product_details(callback: CallbackQuery, callback_data: dict):
     user_id = callback.from_user.id
     field = callback_data.get('field')
 
-    session = await get_active_session(user_id)
-    if not session:
-        await add_user_session(user_id, callback.from_user.username, {})
-
     value = await get_value(user_id, field)
     markup = await gen_details_kb(field)
 
@@ -98,6 +100,11 @@ async def edit_product_details(callback: CallbackQuery, state: FSMContext, callb
 @dp.message_handler(state='change_data')
 async def save_new_details(message: Message, state: FSMContext):
     user_id = message.from_user.id
+
+    session = await get_active_session(user_id)
+    if not session:
+        await add_user_session(user_id, message.from_user.username, {})
+
     value = message.text
 
     async with state.proxy() as data:

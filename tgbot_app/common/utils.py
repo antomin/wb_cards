@@ -10,7 +10,7 @@ from tgbot_app.common.database import (get_active_session, get_last_msg,
 async def get_value(user_id, field):
     session = await get_active_session(user_id)
 
-    data = session.serializable_value(field)
+    data = session.serializable_value(field) if session else None
 
     if not data or data == 'null':
         return 'Нет данных...'

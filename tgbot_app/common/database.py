@@ -31,6 +31,9 @@ def add_user_session(user_id, username, data):
 def update_field_session(user_id, field, value):
     session = UserSession.objects.filter(user=user_id, is_active=True).last()
 
+    if not session:
+        return
+
     session.update_field(field, value)
     session.save()
 
