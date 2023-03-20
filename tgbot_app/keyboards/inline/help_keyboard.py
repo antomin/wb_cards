@@ -12,7 +12,7 @@ async def gen_help_kb(place):
     if place == 'product':
         callback_data = main_menu_cd.new(action='product')
     else:
-        callback_data = ''
+        callback_data = main_menu_cd.new(action='chatgpt')
 
     markup.add(InlineKeyboardButton(text='Назад', callback_data=callback_data))
 

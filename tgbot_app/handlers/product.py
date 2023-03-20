@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import MessageNotModified
 
 from tgbot_app.common.database import add_user_session, get_active_session
-from tgbot_app.common.text_variables import NEW_SKU
+from tgbot_app.common.text_variables import NEW_SKU, PRODUCT_MSG
 from tgbot_app.common.utils import get_value, update_data
 from tgbot_app.common.wb_parser import parse_wb
 from tgbot_app.keyboards.inline import (cancel_state_cd, gen_cancel_kb,
@@ -16,7 +16,7 @@ from tgbot_app.loader import dp
 async def product(callback: CallbackQuery):
     user_id = callback.from_user.id
     markup = await gen_product_kb(user_id)
-    await callback.message.edit_text(text='Меню товара:', reply_markup=markup)
+    await callback.message.edit_text(text=PRODUCT_MSG, reply_markup=markup)
 
 
 @dp.callback_query_handler(scu_cd.filter())
@@ -122,63 +122,3 @@ async def cancel_changing(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     await state.reset_state()
     await callback.message.edit_text(text='Отменено.', reply_markup=markup)
-
-
-
-# @dp.callback_query_handler(details_cd.filter(level='1'))
-# async def change_details(callback: CallbackQuery, callback_data: dict, state: FSMContext):
-#     field = callback_data.get('field')
-#     await state.set_state('change_data')
-#
-#     async with state.proxy() as data:
-#         data['field'] = field
-#
-#     if field == 'product_characteristics':
-#         await callback.message.edit_text(
-#             text='Введите новые характеристики в формате <u>ключ: значение</u>. Каждая новая характеристика вводится с'
-#                  'новой строки:',
-#             reply_markup=await gen_cancel_kb()
-#         )
-#         await callback.answer()
-#         return
-#
-#     if field == 'other_descriptions':
-#         await callback.message.edit_text(
-#             text='Введите через пробел SKU с желаемыми описаниями (максимум 3):',
-#             reply_markup=await gen_cancel_kb()
-#         )
-#         await callback.answer()
-#         return
-#
-#     await callback.message.answer('Введите новые данные:', reply_markup=await gen_cancel_kb())
-#     await callback.answer()
-#
-#
-# @dp.message_handler(state='change_data')
-# async def save_new_details(message: Message, state: FSMContext):
-#     user_id = message.from_user.id
-#     value = message.text
-#     async with state.proxy() as data:
-#         field = data['field']
-#
-#     if field == 'other_descriptions':
-#         await message.answer('Загрузка данных...')
-#
-#     if await update_data(user_id, field, value):
-#         await message.answer(
-#             text='Данные успешно изменены.',
-#             reply_markup=await gen_product_kb(user_id)
-#         )
-#         await state.reset_state()
-#         return
-#
-#     await message.answer(
-#         text='Ошибка при добавлении данных. Попробуйте ещё раз:',
-#         reply_markup=await gen_cancel_kb()
-#     )
-#
-#
-# @dp.callback_query_handler(cancel_cd.filter(), state='change_data')
-# async def cancel_changing(callback: CallbackQuery, state: FSMContext):
-#     await state.reset_state()
-#     await callback.message.edit_text(text='Отменено', reply_markup=await gen_product_kb(callback.from_user.id))

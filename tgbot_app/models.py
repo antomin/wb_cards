@@ -16,10 +16,11 @@ class UserSession(models.Model):
     title = models.CharField(verbose_name='наименование товара', max_length=255, blank=True, null=True)
     description = models.TextField(verbose_name='описание товара', blank=True, null=True)
     characteristics = models.JSONField(verbose_name='характеристики товара', blank=True, null=True)
-    other_description = models.TextField(verbose_name='дополнительные описания 1', blank=True, null=True)
+    other_description = models.TextField(verbose_name='дополнительное описание', blank=True, null=True)
     seo_dict = models.TextField(verbose_name='SEO словарь', blank=True, null=True)
     seo_plus = models.TextField(verbose_name='SEO +', blank=True, null=True)
     important = models.TextField(verbose_name='важное о товаре', blank=True, null=True)
+    style = models.CharField(verbose_name='стиль', max_length=20, blank=True, null=True)
     is_active = models.BooleanField(verbose_name='открыта', default=True)
     created_at = models.DateTimeField(verbose_name='время добавления', auto_now_add=True)
 

@@ -34,14 +34,21 @@ async def update_data(user_id, field, value):
         return False
 
 
-async def gen_conversation(user_id):
+async def gen_conversation(user_id, add_seo):
     conversation = [{'role': 'system', 'content': 'You are a helpful assistant. Fluent Russian speaks.'}]
     msg_history, msg_cnt = await get_msg_history(user_id)
 
     if msg_cnt == 0:
         session = await get_active_session(user_id)
         init_text = f'Напиши описание товара для маркетплейса, используя следующую информацию. Название торговой' \
-                    f'марки {session.product_title}.'
+                    f'марки {session.title}.'
+
+        if add_seo:
+            init_text += f' Добавь SEO словарь: {session.seo_plus}.'
+
+        if session.style:
+            init_text += f' Стиль описания - {session.style}.'
+
         await save_msg(user_id, init_text, is_user=True)
         conversation.append({'role': 'user', 'content': init_text})
 
@@ -56,12 +63,12 @@ async def gen_conversation(user_id):
     return conversation
 
 
-async def get_chatgpt_answer(user_id):
+async def get_chatgpt_answer(user_id, add_seo=False):
     last_msg = await get_last_msg(user_id)
     if last_msg and not last_msg.is_user:
         return last_msg.text
 
-    conversation = await gen_conversation(user_id)
+    conversation = await gen_conversation(user_id, add_seo)
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=conversation,

@@ -12,7 +12,6 @@ async def gen_main_kb():
         InlineKeyboardButton(text='ChatGPT магия', callback_data=main_menu_cd.new(action='chatgpt')),
         InlineKeyboardButton(text='Аккаунт', callback_data=main_menu_cd.new(action='account')),
         InlineKeyboardButton(text='Обновить', callback_data=main_menu_cd.new(action='update')),
-        # InlineKeyboardButton(text='Помощь', callback_data=main_menu_cd.new(action='help')),
     )
 
     return markup
