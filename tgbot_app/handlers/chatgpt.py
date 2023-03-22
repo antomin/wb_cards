@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, Message
 
 from tgbot_app.common.database import (get_active_session, reset_messages,
                                        save_msg, update_field_session)
-from tgbot_app.common.text_variables import CHATGPT_MSG, STYLE_DESC
+from tgbot_app.common.text_variables import HELP_CHATGPT, STYLE_DESC
 from tgbot_app.common.utils import get_chatgpt_answer
 from tgbot_app.keyboards.inline import (chatgpt_cd, chatgpt_style_cd,
                                         gen_cancel_kb, gen_chatgpt_kb,
@@ -24,7 +24,7 @@ async def chatgpt_main(callback: CallbackQuery | Message):
         return
 
     markup = await gen_chatgpt_kb()
-    await callback.message.edit_text(text=CHATGPT_MSG, reply_markup=markup)
+    await callback.message.edit_text(text=HELP_CHATGPT, reply_markup=markup)
 
 
 @dp.callback_query_handler(chatgpt_cd.filter(action='make'))

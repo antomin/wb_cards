@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.exceptions import MessageNotModified
 
 from tgbot_app.common.database import add_user_session, get_active_session
-from tgbot_app.common.text_variables import NEW_SKU, PRODUCT_MSG
+from tgbot_app.common.text_variables import HELP_PRODUCT, NEW_SKU
 from tgbot_app.common.utils import get_value, update_data
 from tgbot_app.common.wb_parser import parse_wb
 from tgbot_app.keyboards.inline import (gen_cancel_kb, gen_details_kb,
@@ -18,15 +18,15 @@ async def product(callback: CallbackQuery | Message):
     markup = await gen_product_kb()
 
     if isinstance(callback, CallbackQuery):
-        await callback.message.edit_text(text=PRODUCT_MSG, reply_markup=markup)
+        await callback.message.edit_text(text=HELP_PRODUCT, reply_markup=markup, disable_web_page_preview=True)
         return
 
-    await callback.answer(text=PRODUCT_MSG, reply_markup=markup)
+    await callback.answer(text=HELP_PRODUCT, reply_markup=markup)
 
 
 @dp.callback_query_handler(scu_cd.filter())
 async def sku(callback: CallbackQuery, state: FSMContext):
-    markup = await gen_cancel_kb()
+    markup = await gen_cancel_kb('product')
     await state.set_state('new_scu')
     await callback.answer()
     await callback.message.edit_text(text=NEW_SKU, reply_markup=markup)
@@ -34,7 +34,7 @@ async def sku(callback: CallbackQuery, state: FSMContext):
 
 @dp.message_handler(state='new_scu')
 async def load_scu(message: Message, state: FSMContext):
-    cancel_markup = await gen_cancel_kb()
+    cancel_markup = await gen_cancel_kb('product')
     _sku = message.text
 
     if _sku.isdigit():
