@@ -12,6 +12,13 @@ def get_active_session(user_id):
 
 @sync_to_async
 def add_user_session(user_id, username, data):
+    sessions = UserSession.objects.filter(user=user_id, is_active=True)
+
+    if sessions:
+        for session in sessions:
+            session.is_active = False
+            session.save()
+
     try:
         user = AppUser.objects.get(id=int(user_id))
     except Exception:

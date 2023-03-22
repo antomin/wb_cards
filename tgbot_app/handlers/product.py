@@ -15,8 +15,7 @@ from tgbot_app.loader import dp
 @dp.message_handler(commands=['product'])
 @dp.callback_query_handler(main_menu_cd.filter(action='product'))
 async def product(callback: CallbackQuery | Message):
-    user_id = callback.from_user.id
-    markup = await gen_product_kb(user_id)
+    markup = await gen_product_kb()
 
     if isinstance(callback, CallbackQuery):
         await callback.message.edit_text(text=PRODUCT_MSG, reply_markup=markup)
@@ -35,7 +34,6 @@ async def sku(callback: CallbackQuery, state: FSMContext):
 
 @dp.message_handler(state='new_scu')
 async def load_scu(message: Message, state: FSMContext):
-    user_id = message.from_user.id
     cancel_markup = await gen_cancel_kb()
     _sku = message.text
 
@@ -48,10 +46,10 @@ async def load_scu(message: Message, state: FSMContext):
             await message.answer('Неверный SKU. попробуйте ещё раз:', reply_markup=cancel_markup)
             return
 
-        await add_user_session(user_id, message.from_user.username, data)
+        await add_user_session(message.from_user.id, message.from_user.username, data)
 
         text = f'<b>Название:</b>\n{data["title"]}\n\n<b>Описание:</b>\n{data["description"][:100]}...'
-        markup = await gen_product_kb(user_id)
+        markup = await gen_product_kb()
 
         await message.answer(text=text, reply_markup=markup)
         await state.reset_state()
@@ -62,10 +60,9 @@ async def load_scu(message: Message, state: FSMContext):
 
 @dp.callback_query_handler(product_cd.filter(level='0'))
 async def show_product_details(callback: CallbackQuery, callback_data: dict):
-    user_id = callback.from_user.id
     field = callback_data.get('field')
 
-    value = await get_value(user_id, field)
+    value = await get_value(callback.from_user.id, field)
     markup = await gen_details_kb(field)
 
     if field == 'seo_dict':
@@ -113,7 +110,7 @@ async def save_new_details(message: Message, state: FSMContext):
     result = await update_data(user_id, field, value)
 
     if result:
-        await message.answer(text='Данные успешно изменены.', reply_markup=await gen_product_kb(user_id))
+        await message.answer(text='Данные успешно изменены.', reply_markup=await gen_product_kb())
         await state.reset_state()
         return
 
@@ -125,7 +122,7 @@ async def save_new_details(message: Message, state: FSMContext):
 
 @dp.callback_query_handler(cancel_state_cd.filter(), state='*')
 async def cancel_changing(callback: CallbackQuery, state: FSMContext):
-    markup = await gen_product_kb(callback.from_user.id)
+    markup = await gen_product_kb()
     await callback.answer()
     await state.reset_state()
     await callback.message.edit_text(text='Отменено.', reply_markup=markup)

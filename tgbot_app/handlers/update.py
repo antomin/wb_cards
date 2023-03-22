@@ -29,5 +29,5 @@ async def update_handler(callback: CallbackQuery):
     await reset_messages(user_id)
     await callback.message.edit_text(
         text='Данные успешно очищены.',
-        reply_markup=await gen_product_kb(user_id)
+        reply_markup=await gen_product_kb()
     )

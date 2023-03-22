@@ -14,5 +14,4 @@ async def start(message: Message | CallbackQuery):
     if isinstance(message, CallbackQuery):
         await message.message.edit_text(text=START_MSG, reply_markup=markup)
     else:
-        await message.delete()
         await message.answer(text=START_MSG, reply_markup=markup)
