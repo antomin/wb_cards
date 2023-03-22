@@ -3,10 +3,10 @@ Description=WBCards telegrambot daemon
 After=network.target
 
 [Service]
-User=wbcards
-Group=wbcards
-WorkingDirectory=/home/wbcards/wb_cards
-ExecStart=/home/wbcards/wb_cards/venv/bin/python /home/wbcards/wb_cards/manage.py runbot
+User=wbcard
+Group=wbcard
+WorkingDirectory=/home/wbcard/wb_cards
+ExecStart=/home/wbcard/wb_cards/venv/bin/python /home/wbcard/wb_cards/manage.py runbot
 Restart=on-abort
 
 [Install]

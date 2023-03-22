@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from openpyxl import load_workbook
 
@@ -7,7 +8,7 @@ from tgbot_app.models import SeoWB
 class Command(BaseCommand):
     def handle(self, *args, **options):
         print('Open file...')
-        wb = load_workbook('./seowb.xlsx')
+        wb = load_workbook(f'{settings.BASE_DIRpyt}/seowb.xlsx')
 
         sheet = wb['WB']
 

@@ -6,7 +6,7 @@ from tgbot_app.keyboards.inline import (gen_product_kb, gen_update_kb,
 from tgbot_app.loader import dp
 
 
-@dp.message_handler(commands=['update'])
+@dp.message_handler(commands=['reset'])
 @dp.callback_query_handler(main_menu_cd.filter(action='update'))
 async def product_handler(callback: CallbackQuery | Message):
     if isinstance(callback, CallbackQuery):
