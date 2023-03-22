@@ -6,7 +6,8 @@ from tgbot_app.common.database import (get_active_session, reset_messages,
 from tgbot_app.common.text_variables import CHATGPT_MSG, STYLE_DESC
 from tgbot_app.common.utils import get_chatgpt_answer
 from tgbot_app.keyboards.inline import (chatgpt_cd, chatgpt_style_cd,
-                                        gen_chatgpt_kb, gen_chatgpt_style_kb,
+                                        gen_cancel_kb, gen_chatgpt_kb,
+                                        gen_chatgpt_style_kb,
                                         gen_chatgpt_sub_kb, main_menu_cd)
 from tgbot_app.loader import dp
 
@@ -53,20 +54,41 @@ async def chat_gpt_creation(callback: CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(chatgpt_cd.filter(action='specify'))
 async def specify_answer(callback: CallbackQuery, state: FSMContext):
     await state.set_state('specify_chatgpt')
+    msg = await callback.message.edit_text(text='Введите уточнения по вашему запросу:',
+                                           reply_markup=await gen_cancel_kb('chatgpt'))
+
+    async with state.proxy() as data:
+        data['prev_message_id'] = msg.message_id
+
     await callback.answer()
-    await callback.message.answer('Введите уточнения по вашему запросу:')
 
 
 @dp.message_handler(state='specify_chatgpt')
 async def set_new_msg(message: Message, state: FSMContext):
     user_id = message.from_user.id
+
+    async with state.proxy() as data:
+        prev_message_id = data['prev_message_id']
+
     await save_msg(user_id, message.text, is_user=True)
-    await message.answer('Загрузка... Может занять до 1мин...')
+
+    await message.delete()
+
+    await dp.bot.edit_message_text(
+        text='Загрузка... Может занять до 1мин...',
+        chat_id=message.chat.id,
+        message_id=prev_message_id,
+    )
 
     text = await get_chatgpt_answer(user_id)
     await save_msg(user_id, text, is_user=False)
 
-    await message.answer(text=text, reply_markup=await gen_chatgpt_sub_kb())
+    await dp.bot.edit_message_text(
+        text=text,
+        chat_id=message.chat.id,
+        message_id=prev_message_id,
+        reply_markup=await gen_chatgpt_sub_kb()
+    )
 
     await state.reset_state()
 

@@ -18,13 +18,14 @@ async def gen_chatgpt_kb(session=True):
 
         return markup
 
-    markup.add(
+    markup.row(
         InlineKeyboardButton(text='Создать описание', callback_data=chatgpt_cd.new(action='make')),
         InlineKeyboardButton(text='Добавить SEO+', callback_data=chatgpt_cd.new(action='make_seo')),
+    ).add(
         InlineKeyboardButton(text='Стиль', callback_data=chatgpt_cd.new(action='style')),
         InlineKeyboardButton(text='Сбросить диалог', callback_data=chatgpt_cd.new(action='reset')),
         InlineKeyboardButton(text='Помощь', callback_data=help_cd.new(place='chatgpt')),
-        InlineKeyboardButton(text='Назад', callback_data=main_menu_cd.new(action='main_menu'))
+        InlineKeyboardButton(text='Назад', callback_data=main_menu_cd.new(action='main_menu')),
     )
 
     return markup

@@ -6,7 +6,7 @@ from tgbot_app.keyboards.inline.start_keyboard import main_menu_cd
 
 scu_cd = CallbackData('scu')
 product_cd = CallbackData('product', 'field', 'level')
-cancel_state_cd = CallbackData('cancel_state')
+cancel_state_cd = CallbackData('cancel_state', 'place')
 
 
 async def gen_product_kb():
@@ -29,9 +29,9 @@ async def gen_product_kb():
     return markup
 
 
-async def gen_cancel_kb():
+async def gen_cancel_kb(place):
     markup = InlineKeyboardMarkup(row_width=1)
-    markup.add(InlineKeyboardButton(text='Отмена', callback_data=cancel_state_cd.new()))
+    markup.add(InlineKeyboardButton(text='Отмена', callback_data=cancel_state_cd.new(place=place)))
 
     return markup
 
