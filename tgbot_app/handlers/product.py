@@ -29,7 +29,10 @@ async def sku(callback: CallbackQuery, state: FSMContext):
     markup = await gen_cancel_kb('product')
     await state.set_state('new_scu')
     await callback.answer()
-    await callback.message.edit_text(text=NEW_SKU, reply_markup=markup)
+    msg = await callback.message.edit_text(text=NEW_SKU, reply_markup=markup)
+
+    async with state.proxy() as data:
+        data['prev_message_id'] = msg.message_id
 
 
 @dp.message_handler(state='new_scu')
@@ -37,13 +40,27 @@ async def load_scu(message: Message, state: FSMContext):
     cancel_markup = await gen_cancel_kb('product')
     _sku = message.text
 
+    await message.delete()
+
+    async with state.proxy() as data:
+        prev_message_id = data['prev_message_id']
+
     if _sku.isdigit():
-        await message.answer('Загрузка данных...')
+        await dp.bot.edit_message_text(
+            text='Загрузка данных...',
+            chat_id=message.chat.id,
+            message_id=prev_message_id,
+        )
 
         data = await parse_wb(_sku)
 
         if not data:
-            await message.answer('Неверный SKU. попробуйте ещё раз:', reply_markup=cancel_markup)
+            await dp.bot.edit_message_text(
+                text='Неверный SKU. попробуйте ещё раз:',
+                chat_id=message.chat.id,
+                message_id=prev_message_id,
+                reply_markup=cancel_markup
+            )
             return
 
         await add_user_session(message.from_user.id, message.from_user.username, data)
@@ -51,7 +68,13 @@ async def load_scu(message: Message, state: FSMContext):
         text = f'<b>Название:</b>\n{data["title"]}\n\n<b>Описание:</b>\n{data["description"][:100]}...'
         markup = await gen_product_kb()
 
-        await message.answer(text=text, reply_markup=markup)
+        await dp.bot.edit_message_text(
+            text=text,
+            chat_id=message.chat.id,
+            message_id=prev_message_id,
+            reply_markup=markup
+        )
+
         await state.reset_state()
 
     else:
@@ -63,13 +86,14 @@ async def show_product_details(callback: CallbackQuery, callback_data: dict):
     field = callback_data.get('field')
 
     value = await get_value(callback.from_user.id, field)
+    text = value + '\n\nДля изменения данных нажмите "Изменить".'
     markup = await gen_details_kb(field)
 
     if field == 'seo_dict':
-        value = 'Раздел на доработке.'
+        text = 'Раздел на доработке.'
 
     try:
-        await callback.message.edit_text(text=value, reply_markup=markup)
+        await callback.message.edit_text(text=text, reply_markup=markup)
     except MessageNotModified:
         await callback.answer()
 

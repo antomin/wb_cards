@@ -63,8 +63,8 @@ def get_msg_history(user_id):
 
 @sync_to_async
 def reset_messages(user_id):
-    msg_history = Message.objects.filter(user_session__user=user_id, is_active=True).order_by('created_at')
-    for msg in msg_history:
+    messages = Message.objects.filter(user_session__user=user_id, is_active=True)
+    for msg in messages:
         msg.is_active = False
         msg.save()
 
