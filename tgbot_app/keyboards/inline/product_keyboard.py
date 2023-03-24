@@ -34,19 +34,3 @@ async def gen_cancel_kb(place):
     markup.add(InlineKeyboardButton(text='Отмена', callback_data=cancel_state_cd.new(place=place)))
 
     return markup
-
-
-# async def gen_details_kb(field):
-#     markup = InlineKeyboardMarkup(row_width=2)
-#
-#     if field in ['characteristics', 'seo_dict']:
-#         change_btn = InlineKeyboardButton(text='На доработке', callback_data=main_menu_cd.new(action='product'))
-#     else:
-#         change_btn = InlineKeyboardButton(text='Изменить', callback_data=product_cd.new(field=field, level='1'))
-#
-#     markup.add(
-#         InlineKeyboardButton(text='Назад', callback_data=main_menu_cd.new(action='product')),
-#         change_btn,
-#     )
-#
-#     return markup

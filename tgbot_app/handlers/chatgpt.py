@@ -43,8 +43,9 @@ async def chat_gpt_creation(callback: CallbackQuery, callback_data: dict):
         return
 
     markup = await gen_chatgpt_sub_kb()
+    cancel_markup = await gen_cancel_kb('chatgpt')
 
-    await callback.message.edit_text('Загрузка... Может занять до 1мин...')
+    await callback.message.edit_text(text='Загрузка... Может занять до 1мин...', reply_markup=cancel_markup)
     text = await get_chatgpt_answer(user_id, add_seo)
     await save_msg(user_id, text, is_user=False)
 
@@ -66,6 +67,7 @@ async def specify_answer(callback: CallbackQuery, state: FSMContext):
 @dp.message_handler(state='specify_chatgpt')
 async def set_new_msg(message: Message, state: FSMContext):
     user_id = message.from_user.id
+    cancel_markup = await gen_cancel_kb('chatgpt')
 
     async with state.proxy() as data:
         prev_message_id = data['prev_message_id']
@@ -78,6 +80,7 @@ async def set_new_msg(message: Message, state: FSMContext):
         text='Загрузка... Может занять до 1мин...',
         chat_id=message.chat.id,
         message_id=prev_message_id,
+        reply_markup=cancel_markup
     )
 
     text = await get_chatgpt_answer(user_id)
