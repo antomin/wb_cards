@@ -1,14 +1,12 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.exceptions import MessageNotModified
 
 from tgbot_app.common.database import add_user_session, get_active_session
 from tgbot_app.common.text_variables import HELP_PRODUCT, NEW_SKU
 from tgbot_app.common.utils import get_value, update_data
 from tgbot_app.common.wb_parser import parse_wb
-from tgbot_app.keyboards.inline import (gen_cancel_kb, gen_details_kb,
-                                        gen_product_kb, main_menu_cd,
-                                        product_cd, scu_cd)
+from tgbot_app.keyboards.inline import (gen_cancel_kb, gen_product_kb,
+                                        main_menu_cd, product_cd, scu_cd)
 from tgbot_app.loader import dp
 
 
@@ -81,36 +79,26 @@ async def load_scu(message: Message, state: FSMContext):
         await message.answer('Неверный SKU. попробуйте ещё раз:', reply_markup=cancel_markup)
 
 
-@dp.callback_query_handler(product_cd.filter(level='0'))
-async def show_product_details(callback: CallbackQuery, callback_data: dict):
+@dp.callback_query_handler(product_cd.filter())
+async def show_product_details(callback: CallbackQuery, state: FSMContext, callback_data: dict):
     field = callback_data.get('field')
 
     value = await get_value(callback.from_user.id, field)
-    text = value + '\n\nДля изменения данных нажмите "Изменить".'
-    markup = await gen_details_kb(field)
-
-    if field == 'seo_dict':
-        text = 'Раздел на доработке.'
-
-    try:
-        await callback.message.edit_text(text=text, reply_markup=markup)
-    except MessageNotModified:
-        await callback.answer()
-
-
-@dp.callback_query_handler(product_cd.filter(level='1'))
-async def edit_product_details(callback: CallbackQuery, state: FSMContext, callback_data: dict):
-    field = callback_data.get('field')
 
     if field == 'seo_plus':
-        text = 'Введите SEO слова через запятую:'
+        text = value + '\n\nВведите SEO слова через запятую:'
     elif field == 'important':
-        text = 'Опишите главные преимущества Вашего товара:'
+        text = value + '\n\nОпишите главные преимущества Вашего товара:'
+    elif field == 'seo_dict':
+        text = 'Раздел на доработке.'
+    elif field == 'characteristics':
+        text = value + '\n\nРаздел на доработке.'
     else:
-        text = 'Введите новые данные:'
+        text = value + '\n\nВведите новые данные:'
 
-    msg = await callback.message.edit_text(text=text, reply_markup=await gen_cancel_kb('product'))
-    await callback.answer()
+    markup = await gen_cancel_kb('product')
+
+    msg = await callback.message.edit_text(text=text, reply_markup=markup)
 
     await state.set_state('change_data')
 
@@ -122,6 +110,7 @@ async def edit_product_details(callback: CallbackQuery, state: FSMContext, callb
 @dp.message_handler(state='change_data')
 async def save_new_details(message: Message, state: FSMContext):
     user_id = message.from_user.id
+    markup = await gen_product_kb()
 
     session = await get_active_session(user_id)
     if not session:
@@ -133,15 +122,20 @@ async def save_new_details(message: Message, state: FSMContext):
         field = data['field']
         prev_message_id = data['prev_message_id']
 
-    result = await update_data(user_id, field, value)
+    if field not in ('characteristics', 'seo_dict'):
+        result = await update_data(user_id, field, value)
+    else:
+        result = True
 
     if result:
+        text = 'Данные успешно изменены.' if field not in ('characteristics', 'seo_dict') else 'Раздел на доработке.'
         await message.delete()
+
         await dp.bot.edit_message_text(
-            text='Данные успешно изменены.',
+            text=text,
             chat_id=message.chat.id,
             message_id=prev_message_id,
-            reply_markup=await gen_product_kb()
+            reply_markup=markup
         )
         await state.reset_state()
         return
@@ -150,5 +144,5 @@ async def save_new_details(message: Message, state: FSMContext):
         text='Ошибка при добавлении данных. Попробуйте ещё раз:',
         chat_id=message.chat.id,
         message_id=prev_message_id,
-        reply_markup=await gen_product_kb()
+        reply_markup=markup
     )
