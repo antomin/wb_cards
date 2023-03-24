@@ -10,16 +10,11 @@ from tgbot_app.keyboards.inline import (gen_cancel_kb, gen_product_kb,
 from tgbot_app.loader import dp
 
 
-@dp.message_handler(commands=['product'])
 @dp.callback_query_handler(main_menu_cd.filter(action='product'))
-async def product(callback: CallbackQuery | Message):
+async def product(callback: CallbackQuery):
     markup = await gen_product_kb()
 
-    if isinstance(callback, CallbackQuery):
-        await callback.message.edit_text(text=HELP_PRODUCT, reply_markup=markup, disable_web_page_preview=True)
-        return
-
-    await callback.answer(text=HELP_PRODUCT, reply_markup=markup)
+    await callback.message.edit_text(text=HELP_PRODUCT, reply_markup=markup, disable_web_page_preview=True)
 
 
 @dp.callback_query_handler(scu_cd.filter())

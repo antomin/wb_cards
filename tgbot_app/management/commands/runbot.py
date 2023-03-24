@@ -1,4 +1,5 @@
 import openai
+from aiogram import Dispatcher
 from aiogram.utils import executor
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -12,7 +13,7 @@ async def register_middlewares(_dp):
     _dp.middleware.setup(EmptyMiddleware())
 
 
-async def on_startup(_dp):
+async def on_startup(_dp: Dispatcher):
     await set_default_commands(_dp)
     await register_middlewares(_dp)
     openai.api_key = settings.OPENAI_API_KEY
