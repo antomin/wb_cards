@@ -1,13 +1,13 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from tgbot_app.common.database import add_user_session, get_active_session
-from tgbot_app.common.text_variables import HELP_PRODUCT, NEW_SKU
-from tgbot_app.common.utils import get_value, update_data
-from tgbot_app.common.wb_parser import parse_wb
 from tgbot_app.keyboards.inline import (gen_cancel_kb, gen_product_kb,
                                         main_menu_cd, product_cd, scu_cd)
 from tgbot_app.loader import dp
+from tgbot_app.utils.database import add_user_session, get_active_session
+from tgbot_app.utils.text_variables import HELP_PRODUCT, NEW_SKU
+from tgbot_app.utils.values_utils import get_value, update_data
+from tgbot_app.utils.wb_parser import parse_wb
 
 
 @dp.callback_query_handler(main_menu_cd.filter(action='product'))
@@ -99,45 +99,45 @@ async def show_product_details(callback: CallbackQuery, state: FSMContext, callb
 
     async with state.proxy() as data:
         data['field'] = field
-        data['prev_message_id'] = msg.message_id
+        data['place'] = 'product'
 
 
-@dp.message_handler(state='change_data')
-async def save_new_details(message: Message, state: FSMContext):
-    user_id = message.from_user.id
-    markup = await gen_product_kb()
-
-    session = await get_active_session(user_id)
-    if not session:
-        await add_user_session(user_id, message.from_user.username, {})
-
-    value = message.text
-
-    async with state.proxy() as data:
-        field = data['field']
-        prev_message_id = data['prev_message_id']
-
-    if field not in ('characteristics', 'seo_dict'):
-        result = await update_data(user_id, field, value)
-    else:
-        result = True
-
-    if result:
-        text = 'Данные успешно изменены.' if field not in ('characteristics', 'seo_dict') else 'Раздел на доработке.'
-        await message.delete()
-
-        await dp.bot.edit_message_text(
-            text=text,
-            chat_id=message.chat.id,
-            message_id=prev_message_id,
-            reply_markup=markup
-        )
-        await state.reset_state()
-        return
-
-    await dp.bot.edit_message_text(
-        text='Ошибка при добавлении данных. Попробуйте ещё раз:',
-        chat_id=message.chat.id,
-        message_id=prev_message_id,
-        reply_markup=markup
-    )
+# @dp.message_handler(state='change_data')
+# async def save_new_details(message: Message, state: FSMContext):
+#     user_id = message.from_user.id
+#     markup = await gen_product_kb()
+#
+#     session = await get_active_session(user_id)
+#     if not session:
+#         await add_user_session(user_id, message.from_user.username, {})
+#
+#     value = message.text
+#
+#     async with state.proxy() as data:
+#         field = data['field']
+#         prev_message_id = data['prev_message_id']
+#
+#     if field not in ('characteristics', 'seo_dict'):
+#         result = await update_data(user_id, field, value)
+#     else:
+#         result = True
+#
+#     if result:
+#         text = 'Данные успешно изменены.' if field not in ('characteristics', 'seo_dict') else 'Раздел на доработке.'
+#         await message.delete()
+#
+#         await dp.bot.edit_message_text(
+#             text=text,
+#             chat_id=message.chat.id,
+#             message_id=prev_message_id,
+#             reply_markup=markup
+#         )
+#         await state.reset_state()
+#         return
+#
+#     await dp.bot.edit_message_text(
+#         text='Ошибка при добавлении данных. Попробуйте ещё раз:',
+#         chat_id=message.chat.id,
+#         message_id=prev_message_id,
+#         reply_markup=markup
+#     )

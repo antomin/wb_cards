@@ -1,15 +1,15 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from tgbot_app.common.database import (get_active_session, reset_messages,
-                                       save_msg, update_field_session)
-from tgbot_app.common.text_variables import HELP_CHATGPT, STYLE_DESC
-from tgbot_app.common.utils import get_chatgpt_answer
 from tgbot_app.keyboards.inline import (chatgpt_cd, chatgpt_style_cd,
                                         gen_cancel_kb, gen_chatgpt_kb,
                                         gen_chatgpt_style_kb,
                                         gen_chatgpt_sub_kb, main_menu_cd)
 from tgbot_app.loader import dp
+from tgbot_app.utils.database import (get_active_session, reset_messages,
+                                      save_msg, update_field_session)
+from tgbot_app.utils.text_variables import HELP_CHATGPT, STYLE_DESC
+from tgbot_app.utils.values_utils import get_chatgpt_answer
 
 
 @dp.callback_query_handler(main_menu_cd.filter(action='chatgpt'))

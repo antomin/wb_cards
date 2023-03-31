@@ -1,8 +1,8 @@
 from aiogram.types import CallbackQuery, Message
 
-from tgbot_app.common.text_variables import HELP_CHATGPT, HELP_PRODUCT
 from tgbot_app.keyboards.inline import gen_help_kb, help_cd
 from tgbot_app.loader import dp
+from tgbot_app.utils.text_variables import HELP_CHATGPT, HELP_PRODUCT
 
 
 @dp.callback_query_handler(help_cd.filter())

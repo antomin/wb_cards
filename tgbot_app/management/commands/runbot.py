@@ -4,9 +4,9 @@ from aiogram.utils import executor
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from tgbot_app.common.set_commands import set_default_commands
 from tgbot_app.handlers import dp
 from tgbot_app.middlewares import EmptyMiddleware
+from tgbot_app.utils.set_commands import set_default_commands
 
 
 async def register_middlewares(_dp):

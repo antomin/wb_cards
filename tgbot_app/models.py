@@ -12,13 +12,13 @@ class AppUser(models.Model):
 
 
 class UserSession(models.Model):
-    user = models.ForeignKey(AppUser, verbose_name='пользователь', on_delete=models.PROTECT)
+    user = models.ForeignKey(AppUser, verbose_name='пользователь', on_delete=models.CASCADE)
     title = models.CharField(verbose_name='наименование товара', max_length=255, blank=True, null=True)
     description = models.TextField(verbose_name='описание товара', blank=True, null=True)
     characteristics = models.JSONField(verbose_name='характеристики товара', blank=True, null=True)
-    other_description = models.TextField(verbose_name='дополнительное описание', blank=True, null=True)
+    sku_plus = models.CharField(verbose_name='дополнительные SCU', max_length=100, blank=True, null=True)
     seo_dict = models.TextField(verbose_name='SEO словарь', blank=True, null=True)
-    seo_plus = models.TextField(verbose_name='SEO +', blank=True, null=True)
+    seo_phrases = models.TextField(verbose_name='SEO фразы', blank=True, null=True)
     important = models.TextField(verbose_name='важное о товаре', blank=True, null=True)
     style = models.CharField(verbose_name='стиль', max_length=20, blank=True, null=True)
     is_active = models.BooleanField(verbose_name='открыта', default=True)
@@ -29,7 +29,7 @@ class UserSession(models.Model):
 
 
 class Message(models.Model):
-    user_session = models.ForeignKey(UserSession, verbose_name='сессия', on_delete=models.PROTECT)
+    user_session = models.ForeignKey(UserSession, verbose_name='сессия', on_delete=models.CASCADE)
     is_user = models.BooleanField(verbose_name='сообщение от пользователя', default=True)
     is_active = models.BooleanField(verbose_name='текущий', default=True)
     text = models.TextField(verbose_name='сообщение')
@@ -43,5 +43,8 @@ class Message(models.Model):
 
 
 class SeoWB(models.Model):
-    frase = models.CharField(verbose_name='фраза', max_length=255)
+    phrase = models.CharField(verbose_name='фраза', max_length=255)
+    lemmas = models.CharField(verbose_name='нормализованная фраза', max_length=255)
     frequency = models.BigIntegerField(verbose_name='частота')
+    created_at = models.DateField(verbose_name='дата добавления')
+

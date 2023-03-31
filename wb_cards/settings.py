@@ -119,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -142,3 +142,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TG_TOKEN = env.str('TG_TOKEN')
 OPENAI_API_KEY = env.str('OPENAI_API_KEY')
+
+# SEO settings
+
+KEYWORDS_LIMIT = 10
+KEYWORDS_FILTER = {'S', 'A'}
+FETCH_DATA_LIMIT = 300
+SEO_DICT_LIMIT = 10

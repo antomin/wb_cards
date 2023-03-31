@@ -1,24 +1,44 @@
+import csv
+from datetime import datetime
+from os import walk
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from openpyxl import load_workbook
+from pymystem3 import Mystem
 
 from tgbot_app.models import SeoWB
 
 
 class Command(BaseCommand):
+    @staticmethod
+    def normalize_text(raw_text: str) -> str:
+        mystem = Mystem()
+        lemmas = mystem.lemmatize(raw_text)
+        return ''.join(lemmas).strip()
+
+    @staticmethod
+    def get_file_name():
+        for _, _, files in walk(f'{settings.BASE_DIR}/files'):
+            return files[0]
+
+    def save_data(self, row):
+        frase, frequency = row
+        lemmas = self.normalize_text(frase)
+        print(frase, lemmas, frequency)
+
     def handle(self, *args, **options):
-        print('Open file...')
-        wb = load_workbook(f'{settings.BASE_DIRpyt}/seowb.xlsx')
-
-        sheet = wb['WB']
-
-        for i in range(1, 1000001):
-            frase = sheet[f'A{i}'].value
-            val = sheet[f'B{i}'].value
-
-            print(i)
-
-            new_str = SeoWB(frase=frase, frequency=int(val))
-            new_str.save()
-
-        print('Done!')
+        file_name = self.get_file_name()
+        str_date = '.'.join(file_name.split()[-1].split('.')[:3])
+        _date = datetime.strptime(str_date, '%d.%m.%Y')
+        print(_date)
+        path = f'{settings.BASE_DIR}/files/{file_name}'
+        with open(path, 'r', encoding='utf8') as file:
+            reader = csv.reader(file)
+            cnt = 1
+            for row in reader:
+                frase, frequency, lemmas = row
+                # lemmas = self.normalize_text(frase)
+                new_row = SeoWB(frase=frase, frequency=frequency, lemmas=lemmas, created_at=_date)
+                new_row.save()
+                print(cnt)
+                cnt += 1

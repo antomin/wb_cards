@@ -1,9 +1,9 @@
 from aiogram.types import CallbackQuery, Message
 
-from tgbot_app.common.database import reset_messages, update_field_session
 from tgbot_app.keyboards.inline import (gen_product_kb, gen_update_kb,
                                         main_menu_cd, update_cd)
 from tgbot_app.loader import dp
+from tgbot_app.utils.database import reset_messages, update_field_session
 
 
 @dp.message_handler(commands=['reset'])
