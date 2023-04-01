@@ -50,7 +50,7 @@ async def load_fields(callback: CallbackQuery, state: FSMContext, callback_data:
     await state.set_state('change_data')
     async with state.proxy() as data:
         data['field'] = field
-        data['place'] = 'creation'
+        data['place'] = place
 
     value = await get_value(callback.from_user.id, field)
 

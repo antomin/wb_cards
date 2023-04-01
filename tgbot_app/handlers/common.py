@@ -20,7 +20,12 @@ async def save_fields(message: Message, state: FSMContext):
         field = data.get('field')
         place = data.get('place')
 
-    markup = await gen_creation_kb() if place == 'creation' else await gen_product_kb(user_id)
+    if place == 'creation':
+        markup = await gen_creation_kb()
+    elif place == 'product':
+        markup = await gen_product_kb(user_id)
+    else:
+        markup = await gen_creation_next_kb()
 
     session = await get_active_session(user_id)
     if not session:

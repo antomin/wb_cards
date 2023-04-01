@@ -3,8 +3,9 @@ import openai
 from tgbot_app.utils.database import (get_active_session, get_last_msg,
                                       get_msg_history, save_msg)
 from tgbot_app.utils.text_variables import (REQUEST_DESC, REQUEST_IMP,
-                                            REQUEST_MAIN, REQUEST_PHR,
-                                            REQUEST_SEO, REQUEST_STYLE)
+                                            REQUEST_MAIN, REQUEST_MIN,
+                                            REQUEST_PHR, REQUEST_SEO,
+                                            REQUEST_STYLE)
 
 
 async def get_init_text(session):
@@ -23,6 +24,8 @@ async def get_init_text(session):
         result += ' ' + REQUEST_SEO.format(seo=_seo)
     if session.seo_phrases:
         result += ' ' + REQUEST_PHR.format(phr=session.seo_phrases)
+    if session.minus_words:
+        result += ' ' + REQUEST_MIN.format(min=session.minus_words)
     if session.important:
         result += ' ' + REQUEST_IMP.format(imp=session.important)
     if session.style and session.style != 'обычный':
