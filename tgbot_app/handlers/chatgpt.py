@@ -17,6 +17,8 @@ async def chat_gpt_creation(callback: CallbackQuery, callback_data: dict):
     session = await get_active_session(user_id)
 
     msg = await callback.message.answer(text='Загрузка... Может занять до 1мин...')
+    await callback.answer()
+
     text = await get_chatgpt_answer(user_id)
     await save_msg(user_id, text, is_user=False)
 
