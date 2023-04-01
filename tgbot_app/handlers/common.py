@@ -2,7 +2,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from tgbot_app.keyboards.inline import (cancel_state_cd, gen_chatgpt_kb,
-                                        gen_creation_kb, gen_product_kb)
+                                        gen_creation_kb, gen_creation_next_kb,
+                                        gen_product_kb, style_cd)
 from tgbot_app.loader import dp
 from tgbot_app.utils.database import (add_user_session, fetch_data,
                                       get_active_session)
@@ -35,19 +36,18 @@ async def save_fields(message: Message, state: FSMContext):
         await msg.edit_text('Загрузка завершена.\nАнализируем ключевые слова...')
 
         word_frequencies = await get_word_frequencies(raw_text)
-        # await update_data(user_id, 'seo_dict', ', '.join(word_frequencies))
 
         await msg.edit_text('Загрузка завершена.\nСловарь создан.\nВыбираем SEO-фразы...')
 
         seo_phrases = await fetch_data(word_frequencies)
+        await update_data(user_id, 'seo_phrases', ', '.join([item.phrase async for item in seo_phrases[:10]]))
 
         await msg.edit_text('Загрузка завершена.\nСловарь создан.\nSEO-фразы выбраны.\nСоставляем Ваш SEO-словарь...')
 
         seo_dict = await get_seo_dictionary(seo_phrases)
-        value = ', '.join(seo_dict)
-        await update_data(user_id, 'seo_dict', value)
+        await update_data(user_id, 'seo_dict', ', '.join(seo_dict))
 
-        await msg.edit_text(text='Ваш SEO-словарь составлен:\n\n' + value, reply_markup=markup)
+        await msg.edit_text(text='Ваш SEO-словарь составлен.', reply_markup=markup)
 
         await state.reset_state()
         return
@@ -71,6 +71,12 @@ async def cancel_changing(callback: CallbackQuery, state: FSMContext, callback_d
     elif place == 'creation':
         markup = await gen_creation_kb()
         text = CREATION_MSG
+    elif place == 'creation_next':
+        session = await get_active_session(callback.from_user.id)
+        markup = await gen_creation_next_kb()
+        text = f'<b>Главное о товаре:</b>\n{session.important}'
+        if session.sku_plus:
+            text += f'\n\n<b>Дополнительные SKU:</b>\n{session.sku_plus}.'
     else:
         markup = None
         text = 'Отменено.'
@@ -78,3 +84,14 @@ async def cancel_changing(callback: CallbackQuery, state: FSMContext, callback_d
     await callback.answer()
     await state.reset_state()
     await callback.message.edit_text(text=text, reply_markup=markup, disable_web_page_preview=True)
+
+
+@dp.callback_query_handler(style_cd.filter())
+async def save_style(callback: CallbackQuery, callback_data: dict):
+    place = callback_data.get('place')
+    markup = await gen_creation_next_kb() if place == 'creation' else await gen_product_kb()
+    value = callback_data.get('value')
+    await update_data(callback.from_user.id, 'style', value)
+
+    await callback.message.answer(f'Вы изменили стиль описания на {value}.', reply_markup=markup)
+    await callback.answer()

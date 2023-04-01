@@ -39,7 +39,7 @@ async def get_word_frequencies(raw_text: str) -> list:
 
 async def get_seo_dictionary(queryset):
     seo_dict = {}
-    for item in queryset:
+    async for item in queryset:
         original_words = item.phrase.split()
         lemmas = item.lemmas.split()
         for i, lemma in enumerate(lemmas):

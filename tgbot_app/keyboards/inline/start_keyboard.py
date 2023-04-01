@@ -10,9 +10,8 @@ async def gen_main_kb():
     markup.add(
         InlineKeyboardButton(text='Новый товар', callback_data=main_menu_cd.new(action='creation')),
         InlineKeyboardButton(text='Корректировка', callback_data=main_menu_cd.new(action='product')),
-        # InlineKeyboardButton(text='ChatGPT магия', callback_data=main_menu_cd.new(action='chatgpt')),
-        # InlineKeyboardButton(text='Аккаунт', callback_data=main_menu_cd.new(action='account')),
-        # InlineKeyboardButton(text='Обновить', callback_data=main_menu_cd.new(action='update')),
+        InlineKeyboardButton(text='Аккаунт', callback_data=main_menu_cd.new(action='account')),
+        InlineKeyboardButton(text='Обновить', callback_data=main_menu_cd.new(action='update')),
     )
 
     return markup
