@@ -36,9 +36,9 @@ class Command(BaseCommand):
             reader = csv.reader(file)
             cnt = 1
             for row in reader:
-                frase, frequency, lemmas = row
+                phrase, frequency, lemmas = row
                 # lemmas = self.normalize_text(frase)
-                new_row = SeoWB(frase=frase, frequency=frequency, lemmas=lemmas, created_at=_date)
+                new_row = SeoWB(phrase=phrase, frequency=frequency, lemmas=lemmas, created_at=_date)
                 new_row.save()
                 print(cnt)
                 cnt += 1
