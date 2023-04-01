@@ -17,9 +17,9 @@ magic-filter==1.0.9
 marshmallow==3.19.0
 multidict==6.0.4
 openai==0.27.1
-openpyxl==3.1.2
 packaging==23.0
 psycopg2-binary==2.9.5
+pymystem3==0.2.0
 python-dotenv==1.0.0
 pytz==2022.7.1
 requests==2.28.2
