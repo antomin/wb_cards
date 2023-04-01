@@ -2,27 +2,11 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from tgbot_app.keyboards.inline import (chatgpt_cd, gen_cancel_kb,
-                                        gen_chatgpt_kb, gen_creation_next_kb,
-                                        main_menu_cd)
+                                        gen_chatgpt_kb, gen_creation_next_kb)
 from tgbot_app.loader import dp
 from tgbot_app.utils.chatgpt_utils import get_chatgpt_answer
 from tgbot_app.utils.database import (get_active_session, reset_messages,
                                       save_msg)
-from tgbot_app.utils.text_variables import HELP_CHATGPT
-
-# @dp.callback_query_handler(main_menu_cd.filter(action='chatgpt'))
-# async def chatgpt_main(callback: CallbackQuery | Message):
-#     session = await get_active_session(callback.from_user.id)
-#
-#     if not session:
-#         await callback.message.edit_text(
-#             text='Не загружено никакой информации о товаре.\nПройдите в раздел Товар и добавьте информацию.',
-#             reply_markup=await gen_chatgpt_kb(session=False)
-#         )
-#         return
-#
-#     markup = await gen_chatgpt_kb()
-#     await callback.message.edit_text(text=HELP_CHATGPT, reply_markup=markup)
 
 
 @dp.callback_query_handler(chatgpt_cd.filter(action='make'))

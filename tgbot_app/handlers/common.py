@@ -20,7 +20,7 @@ async def save_fields(message: Message, state: FSMContext):
         field = data.get('field')
         place = data.get('place')
 
-    markup = await gen_creation_kb() if place == 'creation' else await gen_product_kb()
+    markup = await gen_creation_kb() if place == 'creation' else await gen_product_kb(user_id)
 
     session = await get_active_session(user_id)
     if not session:
@@ -52,9 +52,14 @@ async def save_fields(message: Message, state: FSMContext):
         await state.reset_state()
         return
 
+    if field == 'characteristics':
+        await message.answer('Раздел Характеристики находится на доработке.', reply_markup=markup)
+        await state.reset_state()
+        return
+
     await update_data(user_id, field, value)
 
-    await message.answer('Данные обновлены.', reply_markup=markup)
+    await message.answer('Данные успешно обновлены.', reply_markup=markup)
     await state.reset_state()
 
 
@@ -63,11 +68,11 @@ async def cancel_changing(callback: CallbackQuery, state: FSMContext, callback_d
     place = callback_data.get('place')
 
     if place == 'product':
-        markup = await gen_product_kb()
+        markup = await gen_product_kb(callback.from_user.id)
         text = HELP_PRODUCT
     elif place == 'chatgpt':
-        markup = await gen_chatgpt_kb()
-        text = 'Отменено.'
+        markup = await gen_chatgpt_kb(place)
+        text = 'Изменения отменены.'
     elif place == 'creation':
         markup = await gen_creation_kb()
         text = CREATION_MSG
@@ -79,19 +84,21 @@ async def cancel_changing(callback: CallbackQuery, state: FSMContext, callback_d
             text += f'\n\n<b>Дополнительные SKU:</b>\n{session.sku_plus}.'
     else:
         markup = None
-        text = 'Отменено.'
+        text = 'Изменения отменены.'
 
-    await callback.answer()
     await state.reset_state()
-    await callback.message.edit_text(text=text, reply_markup=markup, disable_web_page_preview=True)
+
+    await callback.message.answer(text=text, reply_markup=markup, disable_web_page_preview=True)
+    await callback.answer()
 
 
 @dp.callback_query_handler(style_cd.filter())
 async def save_style(callback: CallbackQuery, callback_data: dict):
+    user_id = callback.from_user.id
     place = callback_data.get('place')
-    markup = await gen_creation_next_kb() if place == 'creation' else await gen_product_kb()
+    markup = await gen_creation_next_kb() if place == 'creation' else await gen_product_kb(user_id)
     value = callback_data.get('value')
-    await update_data(callback.from_user.id, 'style', value)
+    await update_data(user_id, 'style', value)
 
-    await callback.message.answer(f'Вы изменили стиль описания на {value}.', reply_markup=markup)
+    await callback.message.answer(f'Вы изменили стиль описания на <b>{value}</b>.', reply_markup=markup)
     await callback.answer()

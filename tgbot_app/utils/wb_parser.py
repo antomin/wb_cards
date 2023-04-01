@@ -1,5 +1,4 @@
 import aiohttp
-from aiohttp import ClientConnectorError
 
 
 async def get_characteristics(characteristics):

@@ -1,5 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery
 
 from tgbot_app.keyboards.inline import (creation_cd, gen_cancel_kb,
                                         gen_creation_kb, gen_creation_next_kb,
