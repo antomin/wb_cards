@@ -44,6 +44,10 @@ def update_field_session(user_id, field, value):
         return
 
     session.update_field(field, value)
+
+    if field in ('title', 'important', 'sku_plus'):
+        session.is_updated = True
+
     session.save()
 
 

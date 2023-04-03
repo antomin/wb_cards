@@ -35,11 +35,11 @@ async def get_raw_text(scu_list: list) -> str:
     raw_text = ''
 
     for scu in scu_list:
-        if scu.isdigit():
-            data = await parse_wb(scu)
-            if data and data.get('title'):
+        data = await parse_wb(scu)
+        if data:
+            if data.get('title'):
                 raw_text += data.get('title') + ' '
-            if data and data.get('description'):
+            if data.get('description'):
                 raw_text += data.get('description') + ' '
 
     return raw_text

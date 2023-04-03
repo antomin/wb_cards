@@ -19,7 +19,7 @@ class Command(BaseCommand):
     @staticmethod
     def get_file_name():
         for _, _, files in walk(f'{settings.BASE_DIR}/files'):
-            return files[0]
+            return files[-1]
 
     def save_data(self, row):
         frase, frequency = row

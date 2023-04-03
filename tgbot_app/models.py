@@ -19,10 +19,11 @@ class UserSession(models.Model):
     sku_plus = models.CharField(verbose_name='дополнительные SCU', max_length=100, blank=True, null=True)
     seo_dict = models.TextField(verbose_name='SEO словарь', blank=True, null=True)
     seo_phrases = models.TextField(verbose_name='SEO фразы', blank=True, null=True)
-    keywords = models.TextField(verbose_name='ключевые слова', blank=True, null=True)
+    seo_user = models.TextField(verbose_name='пользовательские SEO слова', blank=True, null=True)
     minus_words = models.TextField(verbose_name='минус слова', blank=True, null=True)
     important = models.TextField(verbose_name='важное о товаре', blank=True, null=True)
     style = models.CharField(verbose_name='стиль', max_length=20, blank=True, null=True)
+    is_updated = models.BooleanField(verbose_name='обновлена', default=False)
     is_active = models.BooleanField(verbose_name='открыта', default=True)
     created_at = models.DateTimeField(verbose_name='время добавления', auto_now_add=True)
 

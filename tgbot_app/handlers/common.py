@@ -5,11 +5,9 @@ from tgbot_app.keyboards.inline import (cancel_state_cd, gen_chatgpt_kb,
                                         gen_creation_kb, gen_creation_next_kb,
                                         gen_product_kb, style_cd)
 from tgbot_app.loader import dp
-from tgbot_app.utils.database import (add_user_session, fetch_data,
-                                      get_active_session)
-from tgbot_app.utils.seo_utils import get_seo_dictionary, get_word_frequencies
+from tgbot_app.utils.database import add_user_session, get_active_session
 from tgbot_app.utils.text_variables import CREATION_MSG, HELP_PRODUCT
-from tgbot_app.utils.values_utils import get_raw_text, update_data
+from tgbot_app.utils.values_utils import update_data
 
 
 @dp.message_handler(state='change_data')
@@ -32,33 +30,10 @@ async def save_fields(message: Message, state: FSMContext):
         await add_user_session(user_id, message.from_user.username, {})
 
     if field == 'sku_plus':
-        msg = await message.answer('Загрузка данных...')
-
-        scu_list = [scu.strip() for scu in value.split(',')[:5]]
-        await update_data(user_id, 'sku_plus', ', '.join(scu_list))
-        raw_text = await get_raw_text(scu_list)
-
-        await msg.edit_text('Загрузка завершена.\nАнализируем ключевые слова...')
-
-        word_frequencies = await get_word_frequencies(raw_text)
-
-        await msg.edit_text('Загрузка завершена.\nСловарь создан.\nВыбираем SEO-фразы...')
-
-        seo_phrases = await fetch_data(word_frequencies)
-        await update_data(user_id, 'seo_phrases', ', '.join([item.phrase async for item in seo_phrases[:10]]))
-
-        await msg.edit_text('Загрузка завершена.\nСловарь создан.\nSEO-фразы выбраны.\nСоставляем Ваш SEO-словарь...')
-
-        seo_dict = await get_seo_dictionary(seo_phrases)
-        await update_data(user_id, 'seo_dict', ', '.join(seo_dict))
-
-        await msg.edit_text(text='Ваш SEO-словарь составлен.', reply_markup=markup)
-
-        await state.reset_state()
-        return
+        value = ', '.join([scu.strip() for scu in value.split(',') if scu.isdigit()])
 
     if field == 'characteristics':
-        await message.answer('Раздел Характеристики находится на доработке.', reply_markup=markup)
+        await message.answer('Раздел "Характеристики" находится на доработке.', reply_markup=markup)
         await state.reset_state()
         return
 
@@ -84,7 +59,7 @@ async def cancel_changing(callback: CallbackQuery, state: FSMContext, callback_d
     elif place == 'creation_next':
         session = await get_active_session(callback.from_user.id)
         markup = await gen_creation_next_kb()
-        text = f'<b>Главное о товаре:</b>\n{session.important}'
+        text = f'<b>{session.title}</b>\n\n<b>Главное о товаре:</b>\n{session.important}'
         if session.sku_plus:
             text += f'\n\n<b>Дополнительные SKU:</b>\n{session.sku_plus}.'
     else:

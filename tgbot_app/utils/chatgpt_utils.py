@@ -19,8 +19,8 @@ async def get_init_text(session):
         _seo = ''
         if session.seo_dict:
             _seo += session.seo_dict
-        if session.keywords:
-            _seo += ' ' + session.keywords
+        if session.seo_user:
+            _seo += ' ' + session.seo_user
         result += ' ' + REQUEST_SEO.format(seo=_seo)
     if session.seo_phrases:
         result += ' ' + REQUEST_PHR.format(phr=session.seo_phrases)
