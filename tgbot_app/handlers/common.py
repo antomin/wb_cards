@@ -1,6 +1,9 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery, Message
 
+from tgbot_app.handlers.chatgpt import chat_gpt_creation
+from tgbot_app.handlers.creation import next_creation, start_creation
+from tgbot_app.handlers.product import product
 from tgbot_app.keyboards.inline import (cancel_state_cd, gen_chatgpt_kb,
                                         gen_creation_kb, gen_creation_next_kb,
                                         gen_product_kb, style_cd)
@@ -47,28 +50,11 @@ async def save_fields(message: Message, state: FSMContext):
 async def cancel_changing(callback: CallbackQuery, state: FSMContext, callback_data: dict):
     place = callback_data.get('place')
 
-    if place == 'product':
-        markup = await gen_product_kb(callback.from_user.id)
-        text = HELP_PRODUCT
-    elif place == 'chatgpt':
-        markup = await gen_chatgpt_kb(place)
-        text = 'Изменения отменены.'
-    elif place == 'creation':
-        markup = await gen_creation_kb()
-        text = CREATION_MSG
-    elif place == 'creation_next':
-        session = await get_active_session(callback.from_user.id)
-        markup = await gen_creation_next_kb()
-        text = f'<b>{session.title}</b>\n\n<b>Главное о товаре:</b>\n{session.important}'
-        if session.sku_plus:
-            text += f'\n\n<b>Дополнительные SKU:</b>\n{session.sku_plus}.'
-    else:
-        markup = None
-        text = 'Изменения отменены.'
+    funcs = {'product': product, 'creation': start_creation, 'creation_next': next_creation}
+
+    await chat_gpt_creation(callback, callback_data) if place == 'chatgpt' else await funcs[place](callback)
 
     await state.reset_state()
-
-    await callback.message.answer(text=text, reply_markup=markup, disable_web_page_preview=True)
     await callback.answer()
 
 
