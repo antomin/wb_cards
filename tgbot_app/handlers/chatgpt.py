@@ -5,8 +5,7 @@ from tgbot_app.keyboards.inline import (chatgpt_cd, gen_cancel_kb,
                                         gen_chatgpt_kb, gen_creation_next_kb)
 from tgbot_app.loader import dp
 from tgbot_app.utils.chatgpt_utils import get_chatgpt_answer
-from tgbot_app.utils.database import (get_active_session, reset_messages,
-                                      save_msg)
+from tgbot_app.utils.database import reset_messages, save_msg
 
 
 @dp.callback_query_handler(chatgpt_cd.filter(action='make'))
@@ -14,13 +13,13 @@ async def chat_gpt_creation(callback: CallbackQuery, callback_data: dict):
     user_id = callback.from_user.id
     markup = await gen_chatgpt_kb(callback_data.get('place'))
 
-    msg = await callback.message.answer(text='Загрузка... Может занять до 1мин...')
+    await callback.message.answer(text='Загрузка... Может занять до 3мин...')
     await callback.answer()
 
     text = await get_chatgpt_answer(user_id)
     await save_msg(user_id, text, is_user=False)
 
-    await msg.edit_text(text=text, reply_markup=markup)
+    await callback.message.answer(text=text, reply_markup=markup)
 
 
 @dp.callback_query_handler(chatgpt_cd.filter(action='specify'))

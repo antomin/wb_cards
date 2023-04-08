@@ -1,4 +1,4 @@
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery
 
 from tgbot_app.keyboards.inline import main_menu_cd
 from tgbot_app.loader import dp

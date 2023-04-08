@@ -28,7 +28,7 @@ env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env.str('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
@@ -148,5 +148,5 @@ OPENAI_API_KEY = env.str('OPENAI_API_KEY')
 KEYWORDS_LIMIT = 10
 KEYWORDS_FILTER = {'S', 'A'}
 FETCH_DATA_LIMIT = 300
-SEO_DICT_LIMIT = 10
+SEO_DICT_LIMIT = None
 SEO_PHRASES_LIMIT = 10

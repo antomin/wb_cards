@@ -59,7 +59,7 @@ async def next_creation(callback: CallbackQuery):
             await msg.edit_text('Данные с WB загружены.\nКлючевые слова собраны.\nSEO-фразы выбраны.\n'
                                 'Составляем Ваш SEO-словарь...')
 
-            seo_dict = await get_seo_dictionary(seo_phrases)
+            seo_dict = await get_seo_dictionary(seo_phrases, limit=settings.SEO_DICT_LIMIT)
             await update_data(user_id, 'seo_dict', ', '.join(seo_dict))
 
             await msg.edit_text(text='Данные с WB загружены.\nКлючевые слова собраны.\nSEO-фразы выбраны.\n'

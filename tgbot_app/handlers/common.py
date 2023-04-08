@@ -4,12 +4,11 @@ from aiogram.types import CallbackQuery, Message
 from tgbot_app.handlers.chatgpt import chat_gpt_creation
 from tgbot_app.handlers.creation import next_creation, start_creation
 from tgbot_app.handlers.product import product
-from tgbot_app.keyboards.inline import (cancel_state_cd, gen_chatgpt_kb,
-                                        gen_creation_kb, gen_creation_next_kb,
-                                        gen_product_kb, style_cd)
+from tgbot_app.keyboards.inline import (cancel_state_cd, gen_creation_kb,
+                                        gen_creation_next_kb, gen_product_kb,
+                                        style_cd)
 from tgbot_app.loader import dp
 from tgbot_app.utils.database import add_user_session, get_active_session
-from tgbot_app.utils.text_variables import CREATION_MSG, HELP_PRODUCT
 from tgbot_app.utils.values_utils import update_data
 
 

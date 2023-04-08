@@ -1,7 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tgbot_app.keyboards.inline.creation_keyboard import (chatgpt_cd,
-                                                          creation_cd)
+from tgbot_app.keyboards.inline.creation_keyboard import chatgpt_cd
 from tgbot_app.keyboards.inline.start_keyboard import main_menu_cd
 
 
