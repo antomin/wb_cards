@@ -16,9 +16,9 @@ async def gen_style_kb(place):
     markup = InlineKeyboardMarkup(row_width=1)
 
     markup.add(
-        InlineKeyboardButton(text='Обычный', callback_data=style_cd.new(value='обычный', place=place)),
-        InlineKeyboardButton(text='Творческий', callback_data=style_cd.new(value='творческий', place=place)),
-        InlineKeyboardButton(text='Формальный', callback_data=style_cd.new(value='формальный', place=place)),
+        InlineKeyboardButton(text='Обычный', callback_data=style_cd.new(value='regular', place=place)),
+        InlineKeyboardButton(text='Творческий', callback_data=style_cd.new(value='creative', place=place)),
+        InlineKeyboardButton(text='Формальный', callback_data=style_cd.new(value='formal', place=place)),
     )
 
     return markup

@@ -65,10 +65,20 @@ STYLE_DESC = '''🎉  <b>Стиль карточки</b>
 
 ########################################################################################################################
 
-REQUEST_MAIN = 'Напиши описание товара для маркетплейса, используя следующую информацию. Название торговой марки - {title}.'
-REQUEST_DESC = 'За основу возьми следующее описание: {desc}.'
-REQUEST_SEO = 'Используй следующий SEO-словарь: {seo}.'
-REQUEST_PHR = 'Используй слудующие SEО-фразы: {phr}.'
-REQUEST_MIN = 'Исключи следующие слова: {min}.'
-REQUEST_IMP = 'Выдели следующие важные характеристики: {imp}.'
-REQUEST_STYLE = 'Стиль описания - {style}.'
+REQUEST_MAIN = '''I want you to act as a very proficient SEO and high-end eCommerce copywriter that speaks and writes fluently Russian. You task is to write Product description for Russian marketplace Wildberries.ru. Product description must be 300 word's long.
+Follow these guidelines:
+- Focus on benefits rather than features
+- Avoid sentences over 20 words
+- Avoid using passive voice
+- Avoid using keywords more than two times
+- The style of the description is "{style}"
+- Include a call to action at the end.
+Base your Product description on following information about the product (into quotes)'''
+
+REQUEST_TITLE = 'Product name : "{title}"'
+REQUEST_IMP = 'Key product features: "{important}"'
+REQUEST_SEO = 'SEO dictionary: "{seo_dict}"'
+REQUEST_SEO_PHR = 'SEO phrase: "{seo_phrases}"'
+REQUEST_MINUS = 'DO NOT USE any words from Minus dictionary: "{minus_words}"'
+
+REQUEST_FINAL = 'If any of SEO dictionary or SEO phrases, that I gave you, are not relevant for the Product, do not use it.'

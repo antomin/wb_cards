@@ -1,5 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
+from django.conf import settings
 
 from tgbot_app.keyboards.inline import (creation_cd, gen_cancel_kb,
                                         gen_creation_kb, gen_creation_next_kb,
@@ -50,19 +51,21 @@ async def next_creation(callback: CallbackQuery):
             msg = await msg.edit_text('Данные с WB загружены.\nКлючевые слова собраны.\nВыбираем SEO-фразы...')
 
             seo_phrases = await fetch_data(word_frequencies)
-            await update_data(user_id, 'seo_phrases', ', '.join([item.phrase async for item in seo_phrases[:10]]))
+            await update_data(
+                user_id,
+                'seo_phrases', ', '.join([item.phrase async for item in seo_phrases[:settings.SEO_PHRASES_LIMIT]])
+            )
 
             await msg.edit_text('Данные с WB загружены.\nКлючевые слова собраны.\nSEO-фразы выбраны.\n'
                                 'Составляем Ваш SEO-словарь...')
 
             seo_dict = await get_seo_dictionary(seo_phrases)
             await update_data(user_id, 'seo_dict', ', '.join(seo_dict))
-            await update_data(user_id, 'is_updated', False)
 
             await msg.edit_text(text='Данные с WB загружены.\nКлючевые слова собраны.\nSEO-фразы выбраны.\n'
                                 'Ваш SEO-словарь составлен.')
 
-            session.is_updated = False
+            await update_data(user_id, 'is_updated', False)
 
     await callback.message.answer(text=text, reply_markup=markup)
     await callback.answer()

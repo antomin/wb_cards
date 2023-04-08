@@ -2,34 +2,27 @@ import openai
 
 from tgbot_app.utils.database import (get_active_session, get_last_msg,
                                       get_msg_history, save_msg)
-from tgbot_app.utils.text_variables import (REQUEST_DESC, REQUEST_IMP,
-                                            REQUEST_MAIN, REQUEST_MIN,
-                                            REQUEST_PHR, REQUEST_SEO,
-                                            REQUEST_STYLE)
+from tgbot_app.utils.text_variables import (REQUEST_FINAL, REQUEST_IMP,
+                                            REQUEST_MAIN, REQUEST_MINUS,
+                                            REQUEST_SEO, REQUEST_SEO_PHR,
+                                            REQUEST_TITLE)
 
 
 async def get_init_text(session):
-    result = ''
+    result = REQUEST_MAIN.format(style=session.style)
 
     if session.title:
-        result += REQUEST_MAIN.format(title=session.title)
-    if session.description:
-        result += ' ' + REQUEST_DESC.format(desc=session.description)
-    if session.seo_dict:
-        _seo = ''
-        if session.seo_dict:
-            _seo += session.seo_dict
-        if session.seo_user:
-            _seo += ' ' + session.seo_user
-        result += ' ' + REQUEST_SEO.format(seo=_seo)
-    if session.seo_phrases:
-        result += ' ' + REQUEST_PHR.format(phr=session.seo_phrases)
-    if session.minus_words:
-        result += ' ' + REQUEST_MIN.format(min=session.minus_words)
+        result += '\n' + REQUEST_TITLE.format(title=session.title)
     if session.important:
-        result += ' ' + REQUEST_IMP.format(imp=session.important)
-    if session.style and session.style != 'обычный':
-        result += ' ' + REQUEST_STYLE.format(style=session.style)
+        result += '\n' + REQUEST_IMP.format(important=session.important)
+    if session.seo_dict:
+        result += '\n' + REQUEST_SEO.format(seo_dict=session.seo_dict)
+    if session.seo_phrases:
+        result += '\n' + REQUEST_SEO_PHR.format(seo_phrases=session.seo_phrases)
+    if session.minus_words:
+        result += '\n' + REQUEST_MINUS.format(minus_keywords=session.minus_words)
+
+    result += '\n' + REQUEST_FINAL
 
     return result
 
@@ -62,12 +55,13 @@ async def get_chatgpt_answer(user_id):
         return last_msg.text
 
     conversation = await gen_conversation(user_id)
-    response = openai.ChatCompletion.create(
+    response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=conversation,
         temperature=2,
         max_tokens=1000,
-        top_p=0.9
+        top_p=0.9,
+        timeout=60,
     )
 
     return response['choices'][0]['message']['content']

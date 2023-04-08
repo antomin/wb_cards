@@ -33,7 +33,8 @@ async def save_fields(message: Message, state: FSMContext):
         await add_user_session(user_id, message.from_user.username, {})
 
     if field == 'sku_plus':
-        value = ', '.join([scu.strip() for scu in value.split(',') if scu.isdigit()])
+        sku_list = [sku.strip() for sku in value.split(',')][:5]
+        value = ', '.join(sku_list)
 
     if field == 'characteristics':
         await message.answer('Раздел "Характеристики" находится на доработке.', reply_markup=markup)
@@ -42,7 +43,15 @@ async def save_fields(message: Message, state: FSMContext):
 
     await update_data(user_id, field, value)
 
-    await message.answer('Данные успешно обновлены.', reply_markup=markup)
+    text = ''
+    if session.title:
+        text += f'<b>{session.title}</b>\n\n'
+    if session.important:
+        text += f'<b>Главное о товаре:</b>\n{session.important}\n\n'
+    if session.sku_plus:
+        text += f'<b>Дополнительные SKU</b>\n{session.sku_plus}\n\n'
+
+    await message.answer(text=text + 'Данные успешно обновлены.', reply_markup=markup)
     await state.reset_state()
 
 

@@ -37,7 +37,7 @@ async def get_word_frequencies(raw_text: str) -> list:
     return word_list
 
 
-async def get_seo_dictionary(queryset):
+async def get_seo_dictionary(queryset, limit=None):
     seo_dict = {}
     async for item in queryset:
         original_words = item.phrase.split()
@@ -47,4 +47,7 @@ async def get_seo_dictionary(queryset):
                 frequency = item.frequency
                 if lemma not in seo_dict or seo_dict[lemma][1] < frequency:
                     seo_dict[lemma] = (original_words[i], frequency)
-    return [word for word, _ in seo_dict.values()][:settings.SEO_DICT_LIMIT]
+    if limit:
+        return [word for word, _ in seo_dict.values()][:settings.SEO_DICT_LIMIT]
+
+    return [word for word, _ in seo_dict.values()]
